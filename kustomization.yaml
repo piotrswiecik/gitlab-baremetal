@@ -1,0 +1,7 @@
+namespace: gitlab
+
+resources:
+  - gitlab-namespace.yaml
+  - gitlab-deploy.yaml
+  - gitlab-omnibus-cm.yaml
+  - gitlab-volume.yaml

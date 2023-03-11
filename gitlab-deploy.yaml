@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitlab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitlab
+  template:
+    metadata:
+      labels:
+        app: gitlab
+    spec:
+      containers:
+        - name: gitlab
+          image: gitlab/gitlab-ce:15.9.3-ce.0
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+            - containerPort: 22
+          volumeMounts:
+            - name: gitlab-volume
+              mountPath: /etc/gitlab
+              subPath: config
+            - name: gitlab-volume
+              mountPath: /var/log/gitlab
+              subPath: logs
+            - name: gitlab-volume
+              mountPath: /var/opt/gitlab
+              subPath: data
+      volumes:
+        - name: gitlab-volume
+          persistentVolumeClaim:
+            claimName: gitlab-volume
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitlab
+spec:
+  type: NodePort
+  ports: 
+    - port: 22
+      name: ssh
+      nodePort: 30022
+    - port: 80
+      name: http
+      nodePort: 30080
+    - port: 443
+      nodePort: 30443
+      name: https
+  selector:
+    app: gitlab
